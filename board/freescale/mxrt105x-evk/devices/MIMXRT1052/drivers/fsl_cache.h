@@ -1,31 +1,8 @@
 /*
- * Copyright (c) 2016, Freescale Semiconductor, Inc.
+ * Copyright 2016-2019 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of Freescale Semiconductor, Inc. nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 #ifndef _FSL_CACHE_H_
 #define _FSL_CACHE_H_
@@ -43,102 +20,97 @@
 
 /*! @name Driver version */
 /*@{*/
-/*! @brief cache driver version 2.0.0. */
-#define FSL_CACHE_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+/*! @brief cache driver version 2.0.2. */
+#define FSL_CACHE_DRIVER_VERSION (MAKE_VERSION(2, 0, 2))
 /*@}*/
 
-#define L1ICACHE_LINESIZE_BYTE (32) /*!< The level 1 ICACHE line size is 32B = 256b. */
-#define L1DCACHE_LINESIZE_BYTE (32) /*!< The level 1 DCACHE line size is 32B = 256b. */
-#if (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0)
-
+#if defined(FSL_FEATURE_SOC_L2CACHEC_COUNT) && FSL_FEATURE_SOC_L2CACHEC_COUNT
 #ifndef FSL_SDK_DISBLE_L2CACHE_PRESENT
-#define FSL_SDK_DISBLE_L2CACHE_PRESENT   0
+#define FSL_SDK_DISBLE_L2CACHE_PRESENT 0
 #endif
- 
-#define L2CACHE_LINESIZE_BYTE (32) /*!< The level 2 CACHE line size is 32B = 256b. */
-#endif /* (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0) */
+#endif /* FSL_FEATURE_SOC_L2CACHEC_COUNT */
 /*******************************************************************************
  * Definitions
  ******************************************************************************/
-#if (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0)
+#if defined(FSL_FEATURE_SOC_L2CACHEC_COUNT) && FSL_FEATURE_SOC_L2CACHEC_COUNT
 
 /*! @brief Number of level 2 cache controller ways. */
 typedef enum _l2cache_way_num
 {
-    kL2CACHE_8ways = 0,         /*!< 8 ways. */
+    kL2CACHE_8ways = 0, /*!< 8 ways. */
 #if defined(FSL_FEATURE_L2CACHE_SUPPORT_16_WAY_ASSOCIATIVITY) && FSL_FEATURE_L2CACHE_SUPPORT_16_WAY_ASSOCIATIVITY
-    kL2CACHE_16ways             /*!< 16 ways. */
-#endif /* FSL_FEATURE_L2CACHE_SUPPORT_16_WAY_ASSOCIATIVITY */
+    kL2CACHE_16ways /*!< 16 ways. */
+#endif              /* FSL_FEATURE_L2CACHE_SUPPORT_16_WAY_ASSOCIATIVITY */
 } l2cache_way_num_t;
 
 /*! @brief Level 2 cache controller way size. */
 typedef enum _l2cache_way_size
 {
-    kL2CACHE_16KbSize  = 1,      /*!< 16 Kb way size. */
-    kL2CACHE_32KbSize  = 2,      /*!< 32 Kb way size. */
-    kL2CACHE_64KbSize  = 3,      /*!< 64 Kb way size. */
-    kL2CACHE_128KbSize = 4,      /*!< 128 Kb way size. */
-    kL2CACHE_256KbSize = 5,      /*!< 256 Kb way size. */
-    kL2CACHE_512KbSize = 6       /*!< 512 Kb way size. */
+    kL2CACHE_16KBSize  = 1, /*!< 16 KB way size. */
+    kL2CACHE_32KBSize  = 2, /*!< 32 KB way size. */
+    kL2CACHE_64KBSize  = 3, /*!< 64 KB way size. */
+    kL2CACHE_128KBSize = 4, /*!< 128 KB way size. */
+    kL2CACHE_256KBSize = 5, /*!< 256 KB way size. */
+    kL2CACHE_512KBSize = 6  /*!< 512 KB way size. */
 } l2cache_way_size;
 
 /*! @brief Level 2 cache controller replacement policy. */
 typedef enum _l2cache_replacement
 {
-    kL2CACHE_Pseudorandom = 0U,    /*!< Peseudo-random replacement policy using an lfsr. */
-    kL2CACHE_Roundrobin            /*!< Round-robin replacemnt policy. */
+    kL2CACHE_Pseudorandom = 0U, /*!< Peseudo-random replacement policy using an lfsr. */
+    kL2CACHE_Roundrobin         /*!< Round-robin replacemnt policy. */
 } l2cache_replacement_t;
 
 /*! @brief Level 2 cache controller force write allocate options. */
 typedef enum _l2cache_writealloc
 {
-    kL2CACHE_UseAwcache = 0,      /*!< Use AWCAHE attribute for the write allocate. */
-    kL2CACHE_NoWriteallocate,     /*!< Force no write allocate. */
-    kL2CACHE_forceWriteallocate   /*!< Force write allocate when write misses. */
+    kL2CACHE_UseAwcache = 0,    /*!< Use AWCAHE attribute for the write allocate. */
+    kL2CACHE_NoWriteallocate,   /*!< Force no write allocate. */
+    kL2CACHE_forceWriteallocate /*!< Force write allocate when write misses. */
 } l2cache_writealloc_t;
 
 /*! @brief Level 2 cache controller tag/data ram latency. */
 typedef enum _l2cache_latency
 {
-    kL2CACHE_1CycleLate = 0,   /*!< 1 cycle of latency. */
-    kL2CACHE_2CycleLate,       /*!< 2 cycle of latency. */
-    kL2CACHE_3CycleLate,       /*!< 3 cycle of latency. */
-    kL2CACHE_4CycleLate,       /*!< 4 cycle of latency. */
-    kL2CACHE_5CycleLate,       /*!< 5 cycle of latency. */
-    kL2CACHE_6CycleLate,       /*!< 6 cycle of latency. */
-    kL2CACHE_7CycleLate,       /*!< 7 cycle of latency. */
-    kL2CACHE_8CycleLate        /*!< 8 cycle of latency. */
+    kL2CACHE_1CycleLate = 0, /*!< 1 cycle of latency. */
+    kL2CACHE_2CycleLate,     /*!< 2 cycle of latency. */
+    kL2CACHE_3CycleLate,     /*!< 3 cycle of latency. */
+    kL2CACHE_4CycleLate,     /*!< 4 cycle of latency. */
+    kL2CACHE_5CycleLate,     /*!< 5 cycle of latency. */
+    kL2CACHE_6CycleLate,     /*!< 6 cycle of latency. */
+    kL2CACHE_7CycleLate,     /*!< 7 cycle of latency. */
+    kL2CACHE_8CycleLate      /*!< 8 cycle of latency. */
 } l2cache_latency_t;
 
 /*! @brief Level 2 cache controller tag/data ram latency configure structure. */
 typedef struct _l2cache_latency_config
 {
-    l2cache_latency_t tagWriteLate;   /*!< Tag write latency. */
-    l2cache_latency_t tagReadLate;    /*!< Tag Read latency. */
-    l2cache_latency_t tagSetupLate;   /*!< Tag setup latency. */
-    l2cache_latency_t dataWriteLate;  /*!< Data write latency. */
-    l2cache_latency_t dataReadLate;   /*!< Data Read latency. */
-    l2cache_latency_t dataSetupLate;  /*!< Data setup latency. */
+    l2cache_latency_t tagWriteLate;  /*!< Tag write latency. */
+    l2cache_latency_t tagReadLate;   /*!< Tag Read latency. */
+    l2cache_latency_t tagSetupLate;  /*!< Tag setup latency. */
+    l2cache_latency_t dataWriteLate; /*!< Data write latency. */
+    l2cache_latency_t dataReadLate;  /*!< Data Read latency. */
+    l2cache_latency_t dataSetupLate; /*!< Data setup latency. */
 } L2cache_latency_config_t;
 
 /*! @brief Level 2 cache controller configure structure. */
 typedef struct _l2cache_config
 {
     /* ------------------------ l2 cachec basic settings ---------------------------- */
-    l2cache_way_num_t wayNum;        /*!< The number of ways. */
-    l2cache_way_size  waySize;        /*!< The way size = Cache Ram size / wayNum. */ 
-    l2cache_replacement_t repacePolicy;/*!< Replacemnet policy. */
+    l2cache_way_num_t wayNum;           /*!< The number of ways. */
+    l2cache_way_size waySize;           /*!< The way size = Cache Ram size / wayNum. */
+    l2cache_replacement_t repacePolicy; /*!< Replacemnet policy. */
     /* ------------------------ tag/data ram latency settings ----------------------- */
     L2cache_latency_config_t *lateConfig; /*!< Tag/data latency configure. Set NUll if not required. */
     /* ------------------------ Prefetch enable settings ---------------------------- */
-    bool istrPrefetchEnable;          /*!< Instruction prefetch enable. */
-    bool dataPrefetchEnable;          /*!< Data prefetch enable. */
+    bool istrPrefetchEnable; /*!< Instruction prefetch enable. */
+    bool dataPrefetchEnable; /*!< Data prefetch enable. */
     /* ------------------------ Non-secure access settings -------------------------- */
-    bool nsLockdownEnable;            /*!< None-secure lockdown enable. */
+    bool nsLockdownEnable; /*!< None-secure lockdown enable. */
     /* ------------------------ other settings -------------------------------------- */
-    l2cache_writealloc_t  writeAlloc;/*!< Write allcoate force option. */     
+    l2cache_writealloc_t writeAlloc; /*!< Write allcoate force option. */
 } l2cache_config_t;
-#endif  /* (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0) */
+#endif /* FSL_FEATURE_SOC_L2CACHEC_COUNT */
 /*******************************************************************************
  * API
  ******************************************************************************/
@@ -184,7 +156,10 @@ static inline void L1CACHE_InvalidateICache(void)
  *
  * @param address  The start address of the memory to be invalidated.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L1ICACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L1 I-cache line size if
+ * startAddr is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void L1CACHE_InvalidateICacheByRange(uint32_t address, uint32_t size_byte);
 
@@ -207,7 +182,7 @@ static inline void L1CACHE_DisableDCache(void)
 }
 
 /*!
- * @brief Invalidate cortex-m7 L1 data cache.
+ * @brief Invalidates cortex-m7 L1 data cache.
  *
  */
 static inline void L1CACHE_InvalidateDCache(void)
@@ -216,7 +191,7 @@ static inline void L1CACHE_InvalidateDCache(void)
 }
 
 /*!
- * @brief Clean cortex-m7 L1 data cache.
+ * @brief Cleans cortex-m7 L1 data cache.
  *
  */
 static inline void L1CACHE_CleanDCache(void)
@@ -225,7 +200,7 @@ static inline void L1CACHE_CleanDCache(void)
 }
 
 /*!
- * @brief CleanInvalidate cortex-m7 L1 data cache.
+ * @brief Cleans and Invalidates cortex-m7 L1 data cache.
  *
  */
 static inline void L1CACHE_CleanInvalidateDCache(void)
@@ -234,43 +209,61 @@ static inline void L1CACHE_CleanInvalidateDCache(void)
 }
 
 /*!
- * @brief Invalidate cortex-m7 L1 data cache by range.
+ * @brief Invalidates cortex-m7 L1 data cache by range.
  *
  * @param address  The start address of the memory to be invalidated.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L1DCACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L1 D-cache line size if
+ * startAddr is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 static inline void L1CACHE_InvalidateDCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    SCB_InvalidateDCache_by_Addr((uint32_t *)address, size_byte);
+    uint32_t startAddr = address & ~((uint32_t)FSL_FEATURE_L1DCACHE_LINESIZE_BYTE - 1U);
+    uint32_t size      = size_byte + address - startAddr;
+
+    SCB_InvalidateDCache_by_Addr((uint32_t *)startAddr, (int32_t)size);
 }
 
 /*!
- * @brief Clean cortex-m7 L1 data cache by range.
+ * @brief Cleans cortex-m7 L1 data cache by range.
  *
- * @param address  The start address of the memory to be invalidated.
+ * @param address  The start address of the memory to be cleaned.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L1DCACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L1 D-cache line size if
+ * startAddr is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 static inline void L1CACHE_CleanDCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    SCB_CleanDCache_by_Addr((uint32_t *)address, size_byte);
+    uint32_t startAddr = address & ~((uint32_t)FSL_FEATURE_L1DCACHE_LINESIZE_BYTE - 1U);
+    uint32_t size      = size_byte + address - startAddr;
+
+    SCB_CleanDCache_by_Addr((uint32_t *)startAddr, (int32_t)size);
 }
 
 /*!
- * @brief CleanInvalidate cortex-m7 L1 data cache by range.
+ * @brief Cleans and Invalidates cortex-m7 L1 data cache by range.
  *
- * @param address  The start address of the memory to be invalidated.
+ * @param address  The start address of the memory to be clean and invalidated.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L1DCACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L1 D-cache line size if
+ * startAddr is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 static inline void L1CACHE_CleanInvalidateDCacheByRange(uint32_t address, uint32_t size_byte)
 {
-    SCB_CleanInvalidateDCache_by_Addr((uint32_t *)address, size_byte);
+    uint32_t startAddr = address & ~((uint32_t)FSL_FEATURE_L1DCACHE_LINESIZE_BYTE - 1U);
+    uint32_t size      = size_byte + address - startAddr;
+
+    SCB_CleanInvalidateDCache_by_Addr((uint32_t *)startAddr, (int32_t)size);
 }
 /*@}*/
 
-#if (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0)
+#if defined(FSL_FEATURE_SOC_L2CACHEC_COUNT) && FSL_FEATURE_SOC_L2CACHEC_COUNT
 /*!
  * @name Control for L2 pl310 cache
  *@{
@@ -286,7 +279,7 @@ void L2CACHE_Init(l2cache_config_t *config);
 /*!
  * @brief Gets an available default settings for the cache controller.
  *
- * This function initializes the cache controller configuration structure with default settings. 
+ * This function initializes the cache controller configuration structure with default settings.
  * The default values are:
  * @code
  *   config->waysNum = kL2CACHE_8ways;
@@ -296,7 +289,7 @@ void L2CACHE_Init(l2cache_config_t *config);
  *   config->istrPrefetchEnable = false;
  *   config->dataPrefetchEnable = false;
  *   config->nsLockdownEnable = false;
- *   config->writeAlloc = kL2CACHE_UseAwcache; 
+ *   config->writeAlloc = kL2CACHE_UseAwcache;
  * @endcode
  * @param config Pointer to the configuration structure.
  */
@@ -331,7 +324,10 @@ void L2CACHE_Invalidate(void);
  *
  * @param address  The start address of the memory to be invalidated.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L2CACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L2 line size if startAddr
+ * is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void L2CACHE_InvalidateByRange(uint32_t address, uint32_t size_byte);
 
@@ -346,9 +342,12 @@ void L2CACHE_Clean(void);
  * @brief Cleans the Level 2 cache lines in the range of two physical addresses.
  * This function cleans all cache lines between two physical addresses.
  *
- * @param address  The start address of the memory to be invalidated.
+ * @param address  The start address of the memory to be cleaned.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L2CACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L2 line size if startAddr
+ * is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void L2CACHE_CleanByRange(uint32_t address, uint32_t size_byte);
 
@@ -363,14 +362,17 @@ void L2CACHE_CleanInvalidate(void);
  * @brief Cleans and invalidates the Level 2 cache lines in the range of two physical addresses.
  * This function cleans and invalidates all cache lines between two physical addresses.
  *
- * @param address  The start address of the memory to be invalidated.
+ * @param address  The start address of the memory to be cleaned and invalidated.
  * @param size_byte  The memory size.
- * @note The start address and size_byte are recommended to be 32-byte aligned.
+ * @note The start address and size_byte should be 32-byte(FSL_FEATURE_L2CACHE_LINESIZE_BYTE) aligned.
+ * The startAddr here will be forced to align to L2 line size if startAddr
+ * is not aligned. For the size_byte, application should make sure the
+ * alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void L2CACHE_CleanInvalidateByRange(uint32_t address, uint32_t size_byte);
 
 /*!
- * @brief Enable or disable to lock down the data and instruction by way.
+ * @brief Enables or disables to lock down the data and instruction by way.
  * This function locks down the cached instruction/data by way and prevent the adresses from
  * being allocated and prevent dara from being evicted out of the level 2 cache.
  * But the normal cache maintenance operations that invalidate, clean or clean
@@ -389,7 +391,7 @@ void L2CACHE_CleanInvalidateByRange(uint32_t address, uint32_t size_byte);
 void L2CACHE_LockdownByWayEnable(uint32_t masterId, uint32_t mask, bool enable);
 
 /*@}*/
-#endif /* (FSL_FEATURE_SOC_L2CACHEC_COUNT > 0) */
+#endif /* FSL_FEATURE_SOC_L2CACHEC_COUNT */
 
 /*!
  * @name Unified Cache Control for all caches (cortex-m7 L1 cache + l2 pl310)
@@ -402,10 +404,12 @@ void L2CACHE_LockdownByWayEnable(uint32_t masterId, uint32_t mask, bool enable);
  *
  * Both cortex-m7 L1 cache line and L2 PL310 cache line length is 32-byte.
  *
- * @param address The physical address of cache.
+ * @param address The physical address.
  * @param size_byte size of the memory to be invalidated.
- * @note address and size are recommended to be aligned to cache line size
- *  32-Byte or else it may generate unpredictable result.
+ * @note address and size should be aligned to cache line size
+ *  32-Byte due to the cache operation unit is one cache line. The startAddr here will be forced
+ * to align to the cache line size if startAddr is not aligned. For the size_byte, application should
+ * make sure the alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void ICACHE_InvalidateByRange(uint32_t address, uint32_t size_byte);
 
@@ -414,39 +418,44 @@ void ICACHE_InvalidateByRange(uint32_t address, uint32_t size_byte);
  *
  * Both cortex-m7 L1 cache line and L2 PL310 cache line length is 32-byte.
  *
- * @param address The physical address of cache.
+ * @param address The physical address.
  * @param size_byte size of the memory to be invalidated.
- * @note address and size are recommended to be aligned to cache line size
- *  32-Byte or else it may generate unpredictable result.
+ * @note address and size should be aligned to cache line size
+ *  32-Byte due to the cache operation unit is one cache line. The startAddr here will be forced
+ * to align to the cache line size if startAddr is not aligned. For the size_byte, application should
+ * make sure the alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void DCACHE_InvalidateByRange(uint32_t address, uint32_t size_byte);
 
 /*!
- * @brief Clean all data caches by range.
+ * @brief Cleans all data caches by range.
  *
  * Both cortex-m7 L1 cache line and L2 PL310 cache line length is 32-byte.
  *
- * @param address The physical address of cache.
- * @param size_byte size of the memory to be clean.
- * @note address and size are recommended to be aligned to cache line size
- *  32-Byte or else it may generate unpredictable result.
+ * @param address The physical address.
+ * @param size_byte size of the memory to be cleaned.
+ * @note address and size should be aligned to cache line size
+ *  32-Byte due to the cache operation unit is one cache line. The startAddr here will be forced
+ * to align to the cache line size if startAddr is not aligned. For the size_byte, application should
+ * make sure the alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void DCACHE_CleanByRange(uint32_t address, uint32_t size_byte);
 
 /*!
- * @brief Clean and Invalidate all data caches by range.
+ * @brief Cleans and Invalidates all data caches by range.
  *
  * Both cortex-m7 L1 cache line and L2 PL310 cache line length is 32-byte.
  *
- * @param address The physical address of cache.
- * @param size_byte size of the memory to be clean.
- * @note address and size are recommended to be aligned to cache line size
- *  32-Byte or else it may generate unpredictable result.
+ * @param address The physical address.
+ * @param size_byte size of the memory to be cleaned and invalidated.
+ * @note address and size should be aligned to cache line size
+ *  32-Byte due to the cache operation unit is one cache line. The startAddr here will be forced
+ * to align to the cache line size if startAddr is not aligned. For the size_byte, application should
+ * make sure the alignment or make sure the right operation order if the size_byte is not aligned.
  */
 void DCACHE_CleanInvalidateByRange(uint32_t address, uint32_t size_byte);
 
 /*@}*/
-
 
 #if defined(__cplusplus)
 }

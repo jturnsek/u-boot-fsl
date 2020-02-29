@@ -1,31 +1,9 @@
 /*
- * Copyright 2017 NXP
+ * Copyright 2017-2019 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
  *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #ifndef _FSL_DCP_H_
@@ -49,15 +27,29 @@ enum _dcp_status
  */
 /*! @name Driver version */
 /*@{*/
-/*! @brief DCP driver version. Version 2.0.0.
+/*! @brief DCP driver version. Version 2.1.3.
  *
- * Current version: 2.0.0
+ * Current version: 2.1.3
  *
  * Change log:
+ *
+ * - Version 2.1.3
+ *  - Bug Fix
+ *   - MISRA C-2012 issue fixed: rule 10.1, 10.3, 10.4, 11.9, 14.4, 16.4 and 17.7.
+ *
+ * - Version 2.1.2
+ *   - Fix sign-compare warning in dcp_reverse_and_copy.
+ *
+ * - Version 2.1.1
+ *   - Add DCP status clearing when channel operation is complete
+ *
+ * - 2.1.0
+ *   - Add byte/word swap feature for key, input and output data
+ *
  * - Version 2.0.0
  *   - Initial version
  */
-#define FSL_DCP_DRIVER_VERSION (MAKE_VERSION(2, 0, 0))
+#define FSL_DCP_DRIVER_VERSION (MAKE_VERSION(2, 1, 3))
 /*@}*/
 
 /*! @brief DCP channel enable.
@@ -65,11 +57,11 @@ enum _dcp_status
  */
 typedef enum _dcp_ch_enable
 {
-    kDCP_chDisable = 0U,    /*!< DCP channel disable */
-    kDCP_ch0Enable = 1U,    /*!< DCP channel 0 enable */
-    kDCP_ch1Enable = 2U,    /*!< DCP channel 1 enable */
-    kDCP_ch2Enable = 4U,    /*!< DCP channel 2 enable */
-    kDCP_ch3Enable = 8U,    /*!< DCP channel 3 enable */
+    kDCP_chDisable   = 0U,  /*!< DCP channel disable */
+    kDCP_ch0Enable   = 1U,  /*!< DCP channel 0 enable */
+    kDCP_ch1Enable   = 2U,  /*!< DCP channel 1 enable */
+    kDCP_ch2Enable   = 4U,  /*!< DCP channel 2 enable */
+    kDCP_ch3Enable   = 8U,  /*!< DCP channel 3 enable */
     kDCP_chEnableAll = 15U, /*!< DCP channel enable all */
 } _dcp_ch_enable_t;
 
@@ -101,14 +93,28 @@ typedef enum _dcp_channel
  */
 typedef enum _dcp_key_slot
 {
-    kDCP_KeySlot0 = 0U,     /*!< DCP key slot 0. */
-    kDCP_KeySlot1 = 1U,     /*!< DCP key slot 1. */
-    kDCP_KeySlot2 = 2U,     /*!< DCP key slot 2.*/
-    kDCP_KeySlot3 = 3U,     /*!< DCP key slot 3. */
-    kDCP_OtpKey = 4U,       /*!< DCP OTP key. */
+    kDCP_KeySlot0     = 0U, /*!< DCP key slot 0. */
+    kDCP_KeySlot1     = 1U, /*!< DCP key slot 1. */
+    kDCP_KeySlot2     = 2U, /*!< DCP key slot 2.*/
+    kDCP_KeySlot3     = 3U, /*!< DCP key slot 3. */
+    kDCP_OtpKey       = 4U, /*!< DCP OTP key. */
     kDCP_OtpUniqueKey = 5U, /*!< DCP unique OTP key. */
-    kDCP_PayloadKey = 6U,   /*!< DCP payload key. */
+    kDCP_PayloadKey   = 6U, /*!< DCP payload key. */
 } dcp_key_slot_t;
+
+/*! @brief DCP key, input & output swap options
+ *
+ */
+typedef enum _dcp_swap
+{
+    kDCP_NoSwap         = 0x0U,
+    kDCP_KeyByteSwap    = 0x40000U,
+    kDCP_KeyWordSwap    = 0x80000U,
+    kDCP_InputByteSwap  = 0x100000U,
+    kDCP_InputWordSwap  = 0x200000U,
+    kDCP_OutputByteSwap = 0x400000U,
+    kDCP_OutputWordSwap = 0x800000U,
+} dcp_swap_t;
 
 /*! @brief DCP's work packet. */
 typedef struct _dcp_work_packet
@@ -128,6 +134,7 @@ typedef struct _dcp_handle
 {
     dcp_channel_t channel;  /*!< Specify DCP channel. */
     dcp_key_slot_t keySlot; /*!< For operations with key (such as AES encryption/decryption), specify DCP key slot. */
+    uint32_t swapConfig;    /*!< For configuration of key, input, output byte/word swap options */
     uint32_t keyWord[4];
     uint32_t iv[4];
 } dcp_handle_t;
@@ -174,15 +181,21 @@ typedef struct _dcp_config
  * @{
  */
 
+/* DCP cannot correctly compute hash for message with zero size. When enabled, driver bypases DCP and returns correct
+ * hash value. If you are sure, that the driver will never be called with zero sized message, you can disable this
+ * feature to reduce code size */
+#define DCP_HASH_CAVP_COMPATIBLE
+
 /*! @brief Supported cryptographic block cipher functions for HASH creation */
 typedef enum _dcp_hash_algo_t
 {
     kDCP_Sha1,   /*!< SHA_1 */
     kDCP_Sha256, /*!< SHA_256 */
+    kDCP_Crc32,  /*!< CRC_32 */
 } dcp_hash_algo_t;
 
 /*! @brief DCP HASH Context size. */
-#define DCP_SHA_BLOCK_SIZE 128                 /*!< internal buffer block size  */
+#define DCP_SHA_BLOCK_SIZE 128U                /*!< internal buffer block size  */
 #define DCP_HASH_BLOCK_SIZE DCP_SHA_BLOCK_SIZE /*!< DCP hash block size  */
 
 /*! @brief DCP HASH Context size. */
@@ -324,6 +337,9 @@ status_t DCP_AES_DecryptEcb(
 /*!
  * @brief Encrypts AES using CBC block mode.
  *
+ * Encrypts AES using CBC block mode.
+ * The source plaintext and destination ciphertext can overlap in system memory.
+ *
  * @param base DCP peripheral base address
  * @param handle Handle used for this request.
  * @param plaintext Input plain text to encrypt
@@ -341,6 +357,9 @@ status_t DCP_AES_EncryptCbc(DCP_Type *base,
 
 /*!
  * @brief Decrypts AES using CBC block mode.
+ *
+ * Decrypts AES using CBC block mode.
+ * The source ciphertext and destination plaintext can overlap in system memory.
  *
  * @param base DCP peripheral base address
  * @param handle Handle used for this request.
@@ -366,19 +385,19 @@ status_t DCP_AES_DecryptCbc(DCP_Type *base,
  * @{
  */
 /*!
-* @brief Encrypts AES using the ECB block mode.
-*
-* Puts AES ECB encrypt work packet to DCP channel.
-*
-* @param base DCP peripheral base address
-* @param handle Handle used for this request.
-* @param[out] dcpPacket Memory for the DCP work packet.
-* @param plaintext Input plain text to encrypt.
-* @param[out] ciphertext Output cipher text
-* @param size Size of input and output data in bytes. Must be multiple of 16 bytes.
-* @return kStatus_Success The work packet has been scheduled at DCP channel.
-* @return kStatus_DCP_Again The DCP channel is busy processing previous request.
-*/
+ * @brief Encrypts AES using the ECB block mode.
+ *
+ * Puts AES ECB encrypt work packet to DCP channel.
+ *
+ * @param base DCP peripheral base address
+ * @param handle Handle used for this request.
+ * @param[out] dcpPacket Memory for the DCP work packet.
+ * @param plaintext Input plain text to encrypt.
+ * @param[out] ciphertext Output cipher text
+ * @param size Size of input and output data in bytes. Must be multiple of 16 bytes.
+ * @return kStatus_Success The work packet has been scheduled at DCP channel.
+ * @return kStatus_DCP_Again The DCP channel is busy processing previous request.
+ */
 status_t DCP_AES_EncryptEcbNonBlocking(DCP_Type *base,
                                        dcp_handle_t *handle,
                                        dcp_work_packet_t *dcpPacket,
@@ -511,7 +530,7 @@ status_t DCP_HASH_Finish(DCP_Type *base, dcp_hash_ctx_t *ctx, uint8_t *output, s
 /*!
  * @brief Create HASH on given data
  *
- * Perform the full SHA in one function call. The function is blocking.
+ * Perform the full SHA or CRC32 in one function call. The function is blocking.
  *
  * @param base DCP peripheral base address
  * @param handle Handle used for the request.

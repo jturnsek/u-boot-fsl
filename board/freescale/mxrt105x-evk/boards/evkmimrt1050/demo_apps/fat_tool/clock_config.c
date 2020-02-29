@@ -55,18 +55,18 @@ static void BOARD_BootClockGate(void)
 {
     /* Disable all unused peripheral clock */
     CCM->CCGR0 = CCGR(kCLOCK_Gpio2) | CCGR(kCLOCK_Trace)
-	    | CCGR(kCLOCK_SimM_or_SimMain_Reg) | CCGR(kCLOCK_FlexSpi_Exsc)
+	    | CCGR(kCLOCK_Sim_M_Main) | CCGR(kCLOCK_FlexSpiExsc)
 	    | CCGR(kCLOCK_Aips_tz2) | CCGR(kCLOCK_Aips_tz1); /* 0xC0C003CF */
     CCM->CCGR1 = CCGR(kCLOCK_Gpio5) | CCGR(kCLOCK_Csu)
-	    | CCGR(kCLOCK_Gpio1) | CCGR(kCLOCK_Semc_Exsc)
+	    | CCGR(kCLOCK_Gpio1) | CCGR(kCLOCK_SemcExsc)
 	    | CCGR(kCLOCK_Pit); /* 0xFC0C3000 */
     CCM->CCGR2 = CCGR(kCLOCK_Gpio3) | CCGR(kCLOCK_Ipmux3)
 	    | CCGR(kCLOCK_Ipmux2) | CCGR(kCLOCK_Ipmux1)
-	    | CCGR(kCLOCK_IomuxcSnvs) | CCGR(kCLOCK_Ocram_Excs); /* 0x0C3F0033 */
+	    | CCGR(kCLOCK_IomuxcSnvs) | CCGR(kCLOCK_OcramExsc); /* 0x0C3F0033 */
     CCM->CCGR3 = CCGR(kCLOCK_IomuxcSnvsGpr) | CCGR(kCLOCK_Gpio4)
 	    | CCGR(kCLOCK_Aoi1); /* 0xC0003300 */
     CCM->CCGR4 = CCGR(kCLOCK_SimEms) | CCGR(kCLOCK_SimM)
-	    | CCGR(kCLOCK_TscDig) | CCGR(kCLOCK_SimM7)
+	    | CCGR(kCLOCK_Tsc) | CCGR(kCLOCK_SimM7)
 	    | CCGR(kCLOCK_IomuxcGpr) | CCGR(kCLOCK_Iomuxc)
 	    | CCGR(kCLOCK_SimM7_Reg); /* 0x0000FF3F */
     CCM->CCGR5 = CCGR(kCLOCK_SnvsLp) | CCGR(kCLOCK_SnvsHp)
