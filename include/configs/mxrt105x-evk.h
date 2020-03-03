@@ -190,4 +190,12 @@
 #undef CONFIG_CMD_IMLS
 #define CONFIG_SYS_BOOTM_LEN		(16*1024*1024)
 
+#ifdef CONFIG_FSL_FSPI
+#define FSL_FSPI_FLASH_SIZE		SZ_64M
+#define FSL_FSPI_FLASH_NUM		1
+#define FSPI0_BASE_ADDR			0x60000000
+#define FSPI0_AMBA_BASE			0
+#endif
+
+
 #endif /* __CONFIG_H */

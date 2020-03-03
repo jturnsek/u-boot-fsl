@@ -67,6 +67,8 @@ static uint32_t PIT_GetInstance(PIT_Type *base)
  */
 void PIT_Init(PIT_Type *base, const pit_config_t *config)
 {
+    uint8_t i;
+    
     assert(NULL != config);
 
 #if !(defined(FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL) && FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL)
@@ -81,7 +83,7 @@ void PIT_Init(PIT_Type *base, const pit_config_t *config)
 
 #if defined(FSL_FEATURE_PIT_TIMER_COUNT) && (FSL_FEATURE_PIT_TIMER_COUNT)
     /* Clear the timer enable bit for all channels to make sure the channel's timer is disabled. */
-    for (uint8_t i = 0U; i < (uint32_t)FSL_FEATURE_PIT_TIMER_COUNT; i++)
+    for (i = 0U; i < (uint32_t)FSL_FEATURE_PIT_TIMER_COUNT; i++)
     {
         base->CHANNEL[i].TCTRL &= ~PIT_TCTRL_TEN_MASK;
     }

@@ -1,1 +1,1 @@
-#PLATFORM_CPPFLAGS += -mno-fdpic
+PLATFORM_CPPFLAGS += -mno-fdpic
