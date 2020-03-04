@@ -19,7 +19,7 @@
 
 #define CONFIG_SYS_ARCH_TIMER
 
-#define CONFIG_SYS_TEXT_BASE		0x00001000
+#define CONFIG_SYS_TEXT_BASE		0x60002000
 
 /*
  * To get Image data right at the 'Load Address' (0x80008000), and thus avoid
