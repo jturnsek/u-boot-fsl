@@ -21,7 +21,8 @@ SECTIONS
 		. = ALIGN(4);
 	}
 
-	.ivt : AT(0x60001000)
+	. = 0x60001000;
+	.ivt :
 	{
 		. = ALIGN(4);
 		KEEP(* (.boot_hdr.ivt))           /* ivt section */

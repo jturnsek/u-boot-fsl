@@ -9,7 +9,8 @@ ccflags-y := -I$(CONFIG_BOARDDIR)/CMSIS/Include -I$(CONFIG_BOARDDIR)/CMSIS/Drive
 	-I$(CONFIG_BOARDDIR)/devices/MIMXRT1052 -I$(CONFIG_BOARDDIR)/devices/MIMXRT1052/drivers \
 	-I$(CONFIG_BOARDDIR)/devices/MIMXRT1052/utilities \
 	-DCPU_MIMXRT1052DVL6B -DPRINTF_FLOAT_ENABLE=0 -DSCANF_FLOAT_ENABLE=0 \
-	-DPRINTF_ADVANCED_ENABLE=0 -DSCANF_ADVANCED_ENABLE=0 -DEVK_MCIMXRM
+	-DPRINTF_ADVANCED_ENABLE=0 -DSCANF_ADVANCED_ENABLE=0 -DEVK_MCIMXRM \
+	-DXIP_BOOT_HEADER_ENABLE=1 -DXIP_BOOT_HEADER_DCD_ENABLE=1
 
 obj-y	:= mxrt105x-evk.o	\
 	./CMSIS/Driver/DriverTemplates/Driver_USART.o	\
@@ -32,6 +33,9 @@ obj-y	:= mxrt105x-evk.o	\
 	./devices/MIMXRT1052/drivers/fsl_clock.o	\
 	./devices/MIMXRT1052/drivers/fsl_pit.o	\
 	./devices/MIMXRT1052/drivers/fsl_enet.o	\
+	./devices/MIMXRT1052/xip/fsl_flexspi_nor_boot.o	\
+	./devices/MIMXRT1052/xip/evkbimxrt1050_flexspi_nor_config.o	\
+	./devices/MIMXRT1052/xip/evkbimxrt1050_sdram_ini_dcd.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/pin_mux.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/board.o	\
 	./boards/evkmimrt1050/demo_apps/fat_tool/clock_config.o \
