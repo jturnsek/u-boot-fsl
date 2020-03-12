@@ -19,7 +19,7 @@
 
 #define CONFIG_SYS_ARCH_TIMER
 
-#define CONFIG_SYS_TEXT_BASE		0x60002000
+#define CONFIG_SYS_TEXT_BASE		0x00000000
 
 /*
  * To get Image data right at the 'Load Address' (0x80008000), and thus avoid
@@ -124,7 +124,7 @@
 	"console=ttyLP0,115200 consoleblank=0 ignore_loglevel "
 
 #define CONFIG_BOOTCOMMAND						\
-	"run mmcboot"
+	"run bootcmd_rootfs"
 
 #define CONFIG_PREBOOT \
 	"fatload mmc 0 ${loadaddr} ${splash} && bmp display ${loadaddr};" \
@@ -146,6 +146,8 @@
 	"tftpdir=imxrt105x/\0" \
 	"gui=/crankdemo/gui.sh\0" \
 	"ssh=yes\0" \
+	"bootargs_romfs=uclinux.physaddr=${loadaddr} root=/dev/mtdblock0\0" \
+	"bootcmd_romfs=setenv bootargs ${bootargs} ${bootargs_romfs};" \
 	"mmcboot=fatload mmc 0 ${loadaddr} ${image} && run addip &&"	\
 		" bootm ${loadaddr}\0" \
 	"netboot=tftp ${tftpdir}${image} && run addip; bootm ${loadaddr}\0" \
